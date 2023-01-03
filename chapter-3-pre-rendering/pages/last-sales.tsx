@@ -15,32 +15,31 @@ interface PropsType {
 
 const LastSalePage = (props: PropsType) => {
   const [sales, setSales] = useState<SalesType[]>(props.sales);
-  //   const [isLoading, setIsLoading] = useState(false);
 
-  const { data, error, isLoading } = useSwr(
-    "https://react-http-323ac-default-rtdb.asia-southeast1.firebasedatabase.app/sales.json"
-  );
+  // const { data, error } = useSwr(
+  //   "https://react-http-323ac-default-rtdb.asia-southeast1.firebasedatabase.app/sales.json"
+  // );
 
   useEffect(() => {
-    if (data) {
-      const transformedSales = [];
-      for (const key in data) {
-        transformedSales.push({
-          id: key,
-          username: data[key].username as string,
-          volume: data[key].volume as number,
-        });
-      }
-      setSales(transformedSales);
-    }
-  }, [data]);
-
-  if (error) {
-    return <p>Failed to Load...</p>;
-  }
-  if (!data && !sales) {
-    return <p>no data</p>;
-  }
+    fetch(
+      "https://react-http-323ac-default-rtdb.asia-southeast1.firebasedatabase.app/sales.json"
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        if (data) {
+          const transformedSales = [];
+          for (const key in data) {
+            transformedSales.push({
+              id: key,
+              username: data[key].username as string,
+              volume: data[key].volume as number,
+            });
+          }
+          setSales(transformedSales);
+        }
+        console.log(data);
+      });
+  }, []);
 
   return (
     <ul>
@@ -70,6 +69,5 @@ export const getStaticProps: GetStaticProps = async () => {
   }
   return {
     props: { sales: transformedSales },
-    revalidate: 10,
   };
 };
